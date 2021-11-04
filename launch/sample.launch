@@ -1,26 +1,17 @@
 <?xml version="1.0"?>
 <launch>
+  <arg name="parent_frame"/>
+  <arg name="child_frame"/>
   <!-- base_link -->
-  <node name="base_link" pkg="tunable_static_tf_broadcaster" type="tunable_static_tf_broadcaster_node.py" >
+  <node name="tf_tune" pkg="tunable_static_tf_broadcaster" type="tunable_static_tf_broadcaster_node.py" >
     <param name="rate" value="10.0" type="double" /> <!-- tfの更新レート[Hz]-->
-    <param name="header_frame" value="world" type="string" /> <!-- tfのヘッダフレームID -->
-    <param name="child_frame" value="base_link" type="string" /> <!-- tfの子フレームID-->
-    <param name="yaml" value="$(find tunable_static_tf_broadcaster)/params/base_link.yaml" type="string" /> <!-- 初期化用yaml -->
-  </node>
-
-  <!-- arm -->
-  <node name="arm" pkg="tunable_static_tf_broadcaster" type="tunable_static_tf_broadcaster_node.py" >
-    <param name="rate" value="10.0" type="double" /> <!-- tfの更新レート[Hz]-->
-    <param name="header_frame" value="base_link" type="string" /> <!-- tfのヘッダフレームID -->
-    <param name="child_frame" value="arm" type="string" /> <!-- tfの子フレームID-->
-    <param name="yaml" value="$(find tunable_static_tf_broadcaster)/params/arm.yaml" type="string" /> <!-- 初期化用yaml -->
+    <param name="header_frame" value="$(arg parent_frame)" type="string" /> <!-- tfのヘッダフレームID -->
+    <param name="child_frame" value="$(arg child_frame)" type="string" /> <!-- tfの子フレームID-->
+    
   </node>
 
   <!-- 設定用rqt_reconfigure -->
   <node name="rqt_reconfigure" pkg="rqt_reconfigure" type="rqt_reconfigure" />
 
-  <!-- dynamic_reconfigureの調整済みパラメータロード -->
-  <node name="load_base_link" pkg="dynamic_reconfigure" type="dynparam" args="load base_link $(find tunable_static_tf_broadcaster)/params/base_link.yaml" />
-  <node name="load_arm" pkg="dynamic_reconfigure" type="dynparam" args="load arm $(find tunable_static_tf_broadcaster)/params/arm.yaml" />
 
 </launch>
