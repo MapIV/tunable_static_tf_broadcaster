@@ -1,40 +1,36 @@
 # Tunable static tf broadcaster
-dynamic_reconfigureを用いて、GUIでtf2のxyzrpyを変更してbroadcastするノード
 
-![デモ](./demo.gif)
+The Tunable static tf broadcaster is a node that changes the values of x, y, z, roll, pitch, and yaw using the GUI of the rqt_reconfigure and then publishes them.
 
-## 動作
-以下を参考にxyzrpyをdynamic_reconfigureでいじれるようにしている
-- http://wiki.ros.org/tf2/Tutorials/Writing%20a%20tf2%20static%20broadcaster%20%28Python%29
+![Demo](./demo.gif)
 
-## quick start
-```
-roslaunch tunable_static_tf_broadcaster sample.launch
+## Quick start
+
+```sh
+ros2 launch tunable_static_tf_broadcaster sample.launch.xml
 ```
 
-## tfのフレームの増やし方
-tunable_static_tf_broadcaster_nodeを複数立ち上げることでフレームを増やせます。
+## How to add tf frames
 
-1. sample.launchをコピーして適当な名前をつける
-2. 以下のノードのブロックを追加していく
+To increase the number of frames, several instances of the `tunable_static_tf_broadcaster_node` must be launched.
 
-```
-  <!-- 追加するノード -->
-  <node name="ノード名" pkg="tunable_static_tf_broadcaster" type="tunable_static_tf_broadcaster_node.py" >
-    <param name="rate" value="10.0" type="double" /> <!-- tfの更新レート[Hz]-->
-    <param name="header_frame" value="親フレームのID" type="string" /> <!-- tfのヘッダフレームID -->
-    <param name="child_frame" value="子のフレームID" type="string" /> <!-- tfの子フレームID-->
-    <param name="yaml" value="$(find tunable_static_tf_broadcaster)/params/初期化に使うyaml" type="string" /> <!-- 初期化用yaml -->
+1. Copy the `sample.launch.xml` and assign it a suitable name
+2. Add the following lock to the launcher
+
+```xml
+  <!-- Add an additional node -->
+  <node name="node_name" pkg="tunable_static_tf_broadcaster" exec="tunable_static_tf_broadcaster_node.py" >
+    <param name="rate" value="10.0" type="double" /> <!-- Update frequency of the tf [Hz]-->
+    <param name="header_frame" value="parent_frame_id" type="string" /> <!-- header frame ID of the tf-->
+    <param name="child_frame" value="cild_frame_id" type="string" /> <!-- child frame ID-->
+    <param from="$(find-pkg-share tunable_static_tf_broadcaster)/params/initial_values.yaml" /> <!-- YAML file containing the initial values -->
   </node>
 ```
 
-## dynamic_reconfigureで設定したパラメータをロードする方法
-1. dynamic_reconfigureで適切なパラメータを設定し、GUIからyamlを保存する
+## How to load the parameters set by the rqt_reconfigure
 
-![パラメータ保存](./save_param.png)
+1. Using `rqt_reconfigure` set the appropriate parameters and save the yaml file from the GUI.
 
-2. 保存したyamlをlaunchで起動時にロードするように設定する。以下のような行を追加する
+   ![Save parameters](./save_param.png)
 
-```
-<node name="load_ロードする設定名" pkg="dynamic_reconfigure" type="dynparam" args="load dynamic_reconfigureの名前 $(find tunable_static_tf_broadcaster)/params/パラメータファイル.yaml" />
-```
+2. Configure the previous yaml file so it loads the saved parameters at load time
