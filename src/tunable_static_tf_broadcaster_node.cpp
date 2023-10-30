@@ -127,10 +127,10 @@ SetParametersResult TunableStaticTfBroadcasterNode::onParameter(
     update_param("tf_z", t.transform.translation.z);
 
     tf2::Quaternion quaternion;
-    quaternion.x = t.transform.rotation.getX();
-    quaternion.y = t.transform.rotation.getY();
-    quaternion.z = t.transform.rotation.getZ();
-    quaternion.w = t.transform.rotation.getW();
+    quaternion.setX(t.transform.rotation.x);
+    quaternion.setY(t.transform.rotation.y);
+    quaternion.setZ(t.transform.rotation.z);
+    quaternion.setW(t.transform.rotation.w);
 
     double roll{};
     double pitch{};

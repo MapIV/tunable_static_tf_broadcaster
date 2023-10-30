@@ -50,7 +50,13 @@ inline geometry_msgs::msg::Quaternion createQuaternionFromRPY(
 {
   tf2::Quaternion q;
   q.setRPY(roll, pitch, yaw);
-  return tf2::toMsg(q);
+
+  geometry_msgs::msg::Quaternion q_ros;
+  q_ros.x = q.getX();
+  q_ros.y = q.getY();
+  q_ros.z = q.getZ();
+  q_ros.w = q.getW();
+  return q_ros;
 }
 
 class TunableStaticTfBroadcasterNode : public rclcpp::Node

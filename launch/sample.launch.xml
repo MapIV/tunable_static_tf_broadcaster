@@ -1,7 +1,17 @@
 <?xml version="1.0"?>
 <launch>
-  <arg name="parent_frame" />
-  <arg name="child_frame" />
+  <set_parameter name="use_sim_time" value="true" />
+
+  <arg name="parent_frame" default="pandar_qt_c" />
+  <arg name="child_frame" default="c_f" />
+
+  <node pkg="m4_image_proc" exec="image_decompressor" name="image_decompressor">
+    <param name="qos/sub" value="aaa"/>
+    <param name="qos/pub" value="aaa"/>
+    <remap from="in/image" to="/sensing/camera/c_f/image_raw/compressed" />
+    <remap from="out/image" to="/sensing/camera/c_f/image_raw" />
+  </node>
+
   <!-- base_link -->
   <node name="base_link" pkg="tunable_static_tf_broadcaster" exec="tunable_static_tf_broadcaster_node">
     <param name="rate" value="10.0"/>

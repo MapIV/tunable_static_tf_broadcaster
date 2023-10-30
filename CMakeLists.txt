@@ -8,11 +8,14 @@ if (NOT CMAKE_CXX_STANDARD)
 endif ()
 
 find_package(ament_cmake_auto REQUIRED)
+find_package(geometry_msgs REQUIRED)
 ament_auto_find_build_dependencies()
 
 ament_auto_add_library(tunable_static_tf_broadcaster_node_component SHARED
   src/tunable_static_tf_broadcaster_node.cpp
 )
+
+target_link_libraries(tunable_static_tf_broadcaster_node_component ${geometry_msgs_LIBRARIES})
 
 rclcpp_components_register_node(tunable_static_tf_broadcaster_node_component
   PLUGIN "tunable_static_tf_broadcaster::TunableStaticTfBroadcasterNode"
