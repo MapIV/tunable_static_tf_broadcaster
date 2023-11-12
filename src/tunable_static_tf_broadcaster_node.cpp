@@ -42,13 +42,17 @@ TunableStaticTfBroadcasterNode::TunableStaticTfBroadcasterNode(
 
   // Initialize transform
   {
-    transform_.transform.translation.x = this->declare_parameter("tf_x", 0.0);
-    transform_.transform.translation.y = this->declare_parameter("tf_y", 0.0);
-    transform_.transform.translation.z = this->declare_parameter("tf_z", 0.0);
+    transform_.transform.translation.x =
+        this->declare_parameter("tf_t_0_x", 0.0);
+    transform_.transform.translation.y =
+        this->declare_parameter("tf_t_1_y", 0.0);
+    transform_.transform.translation.z =
+        this->declare_parameter("tf_t_2_z", 0.0);
     transform_.transform.rotation = createQuaternionFromRPY(
-        this->declare_parameter_with_min_max("tf_roll", 0.0, -6.3, 6.3),
-        this->declare_parameter_with_min_max("tf_pitch", 0.0, -6.3, 6.3),
-        this->declare_parameter_with_min_max("tf_yaw", 0.0, -6.3, 6.3));
+        this->declare_parameter_with_min_max("tf_r_0_yaw", 0.0, -6.3, 6.3),
+        this->declare_parameter_with_min_max("tf_r_1_pitch", 0.0, -6.3, 6.3),
+        this->declare_parameter_with_min_max("tf_r_2_roll", 0.0, -6.3, 6.3)
+    );
   }
 
   // Get configuration from param
@@ -122,9 +126,9 @@ SetParametersResult TunableStaticTfBroadcasterNode::onParameter(
 
   try {
     auto& t = transform_;
-    update_param("tf_x", t.transform.translation.x);
-    update_param("tf_y", t.transform.translation.y);
-    update_param("tf_z", t.transform.translation.z);
+    update_param("tf_t_0_x", t.transform.translation.x);
+    update_param("tf_t_1_y", t.transform.translation.y);
+    update_param("tf_t_2_z", t.transform.translation.z);
 
     tf2::Quaternion quaternion;
     quaternion.setX(t.transform.rotation.x);
@@ -137,15 +141,42 @@ SetParametersResult TunableStaticTfBroadcasterNode::onParameter(
     double yaw{};
     tf2::Matrix3x3(quaternion).getRPY(roll, pitch, yaw);
 
-    update_param("tf_roll", roll);
-    update_param("tf_pitch", pitch);
-    update_param("tf_yaw", yaw);
+    update_param("tf_r_0_yaw", yaw);
+    update_param("tf_r_1_pitch", pitch);
+    update_param("tf_r_2_roll", roll);
     t.transform.rotation = createQuaternionFromRPY(roll, pitch, yaw);
     RCLCPP_DEBUG(this->get_logger(),
                  "Setting parameters by params... {x: %lf y: %lf z: %lf roll: "
                  "%lf pitch: %lf yaw: %lf}",
                  t.transform.translation.x, t.transform.translation.y,
                  t.transform.translation.z, roll, pitch, yaw);
+
+    // clang-format off
+    RCLCPP_INFO_STREAM(this->get_logger(),
+      "<node pkg=\"tf2_ros\" exec=\"static_transform_publisher\" name=\"tf_"
+      << transform_.header.frame_id
+      << "_"
+      << transform_.child_frame_id
+      << "\" args=\""
+      << t.transform.translation.x
+      << " "
+      << t.transform.translation.y
+      << " "
+      << t.transform.translation.z
+      << " "
+      << yaw
+      << " "
+      << pitch
+      << " "
+      << roll
+      << " "
+      << transform_.header.frame_id
+      << " "
+      << transform_.child_frame_id
+      << "\"/>"
+    );
+    // clang-format on
+
   } catch (const rclcpp::exceptions::InvalidParameterTypeException& e) {
     result.successful = false;
     result.reason = e.what();
