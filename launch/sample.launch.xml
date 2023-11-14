@@ -2,12 +2,12 @@
 <launch>
   <set_parameter name="use_sim_time" value="true" />
 
-  <arg name="parent_frame" default="pandar_40p_r" />
-  <arg name="child_frame" default="c_f" />
+  <arg name="parent_frame" default="pandar_qt_l" />
+  <arg name="child_frame" default="c_l" />
 
   <!-- base_link -->
   <node name="base_link" pkg="tunable_static_tf_broadcaster" exec="tunable_static_tf_broadcaster_node" output="screen">
-    <param name="rate" value="10.0"/>
+    <param name="rate" value="20.0"/>
     <param name="header_frame" value="$(var parent_frame)"/>
     <param name="child_frame" value="$(var child_frame)"/>
   </node>
